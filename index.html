@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A layout example that shows off a responsive email layout.">
+    <title>Games</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+    
+    
+    
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="css/layouts/email-old-ie.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="css/layouts/email.css">
+        <!--<![endif]-->
+</head>
+<body style="height: 100%">
+
+
+
+
+
+
+<div id="layout" class="content pure-g box"  style="height: 100%">
+    <div id="nav" class="pure-u">
+        <a href="#" class="nav-menu-button">Menu</a>
+
+        <div class="nav-inner">
+            <button class="primary-button pure-button" onclick="add_new_game()">Compose</button>
+
+            <div class="pure-menu">
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item" onclick="inbox_games()"><a class="pure-menu-link">Inbox</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Important</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Sent</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Drafts</a></li>
+                    <li class="pure-menu-item" onclick="trash_games()"><a class="pure-menu-link">Trash</a></li>
+                    <li class="pure-menu-heading">Labels</li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link"><span class="email-label-personal"></span>Personal</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link"><span class="email-label-work"></span>Work</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link"><span class="email-label-travel"></span>Travel</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="list" class="pure-u-1">
+
+
+
+    </div>
+
+    <div id="main" class="pure-u-1"  style="height: 100%">
+
+
+    </div>
+
+
+</div>
+
+<script src="https://yui-s.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script>
+    YUI().use('node-base', 'node-event-delegate', function (Y) {
+
+        var menuButton = Y.one('.nav-menu-button'),
+            nav        = Y.one('#nav');
+
+        // Setting the active class name expands the menu vertically on small screens.
+        menuButton.on('click', function (e) {
+            nav.toggleClass('active');
+        });
+
+        // Your application code goes here...
+
+    });
+
+
+
+    let games = [
+        {'publisher' : 'Namco', 'avatar' : 'https://archive.org/services/img/msdos_Pac-Man_1983', 'subject' : 'Pac-Man', 'body' : 'Pac-Man stars a little, yellow dot-muncher who works his way around to clear a maze of the dots.', 'date' : '1983', 'ifrmSrc' : 'https://archive.org/embed/msdos_Pac-Man_1983'},
+        {'publisher' : 'Broderbund', 'avatar' : 'https://archive.org/services/img/msdos_Where_in_the_World_is_Carmen_Sandiego_1985', 'subject' : 'Where in the World is Carmen Sandiego', 'body' : 'Capture the thief that stole the artifact using clues dealing with your knowledge of geography.', 'date' : '1985', 'ifrmSrc' : 'https://archive.org/embed/msdos_Where_in_the_World_is_Carmen_Sandiego_1985'},
+        {'publisher' : 'Ingenuity', 'avatar' : 'https://archive.org/services/img/msdos_Crosscountry_Canada_1991', 'subject' : 'Crosscountry Canada', 'body' : 'Drive an 18-wheel truck picking up and delivering a variety of commodities with typed-in commands.', 'date' : '1991', 'ifrmSrc' : 'https://archive.org/embed/msdos_Crosscountry_Canada_1991'},
+
+    ];
+
+    let trash = [];
+
+    // current selected index
+    let selected_game = 0 ;
+
+
+   // check if local storage exist
+
+    if (localStorage.getItem("games") === null) {
+        localStorage.setItem("games", JSON.stringify(games));
+    }
+
+    if(localStorage.getItem("trash") == null)
+    {
+        localStorage.setItem("trash" , JSON.stringify(trash));
+    }
+
+
+    // on click for game inbox
+
+    var game_details = function  (i) {
+
+
+        return function () {
+
+            show_game_details(i);
+
+        }
+
+
+    };
+
+    // on click for game trash
+
+    var trash_details = function  (i) {
+
+
+        return function () {
+
+            show_trash_details(i);
+
+        }
+
+
+    };
+
+
+    // show selected game from inbox
+    var show_game_details = function (i) {
+
+        var games = JSON.parse(localStorage.getItem("games"));
+        $(".email-item").removeClass('email-item-unread').addClass('email-item-selected');
+
+        $('#game'+i+'').removeClass('email-item-selected').addClass('email-item-unread');
+
+        $('#title').html(games[i]['subject']);
+        $('#publisher').html(games[i]['publisher']);
+        $('#publish_date').html(games[i]['date']);
+
+        $('#play_game').attr('src' , games[i]['ifrmSrc']);
+
+        selected_game = i ;
+    }
+
+    // show selected game from trash
+
+    var show_trash_details = function (i) {
+
+        var games = JSON.parse(localStorage.getItem("trash"));
+        $(".email-item").removeClass('email-item-unread').addClass('email-item-selected');
+
+        $('#game'+i+'').removeClass('email-item-selected').addClass('email-item-unread');
+
+        $('#title').html(games[i]['subject']);
+        $('#publisher').html(games[i]['publisher']);
+        $('#publish_date').html(games[i]['date']);
+
+        $('#play_game').attr('src' , games[i]['ifrmSrc']);
+
+        selected_game = i ;
+    }
+
+
+    // add new game
+    function add_new_game()
+
+    {
+
+        document.getElementById('main').innerHTML = '<div style="padding: 20px">' +
+            '<div>Game Title</div>\n' +
+            '        <input type="text" id="title_input" > ' +
+            '<div>Publisher</div>' +
+            '  <input type="text" id="publisher_input">' +
+            ' <div>Year Published</div>' +
+            '  <input type="text" id="year_input" >' +
+            ' <div>Description</div>' +
+            ' <textarea type="text" id="description_input" ></textarea>'+
+            ' <div>Avatar Url</div>' +
+            ' <input type="text" id="avatar_input" >'+
+            ' <div>iFrame Url</div>' +
+            ' <input type="text" id="frame_input" ><br>'+
+                '<button onclick="save_game()">  SAVE  </button>'+
+                '</div> ';
+
+
+    }
+
+
+
+    // inbox game list
+    function inbox_games() {
+
+        if(JSON.parse(localStorage.getItem("games")).length > 0) {
+            document.getElementById('main').innerHTML = ' <div class="email-content" style="height: 100%">\n' +
+                '            <div class="email-content-header pure-g">\n' +
+                '                <div class="pure-u-1-2">\n' +
+                '                    <h1 class="email-content-title" id="title" ></h1>\n' +
+                '                    <p class="email-content-subtitle">\n' +
+                '                        Published by : <a id="publisher"></a>  <span id="publish_date"></span>\n' +
+                '                    </p>\n' +
+                '                </div>\n' +
+                '\n' +
+                '                <div class="email-content-controls pure-u-1-2">\n' +
+                '                    <button class="secondary-button pure-button" onclick="delete_game()">Delete</button>\n' +
+                '                    <button class="secondary-button pure-button">Forward</button>\n' +
+                '                    <button class="secondary-button pure-button">Move to</button>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '\n' +
+                '            <div class="email-content-body row content "  class="pure-u" style="height: 500px">\n' +
+                '\n' +
+                '\n' +
+                '                <iframe id="play_game" width="100%" height="100%"></iframe>\n' +
+                '            </div>\n' +
+                '        </div>';
+
+
+            games_list = document.getElementById('list');
+
+            while (games_list.firstChild) {
+                games_list.removeChild(games_list.firstChild);
+            }
+
+            var games = JSON.parse(localStorage.getItem("games"));
+
+            for (var i = 0; i < games.length; i++) {
+                var div = document.createElement('div');
+                var id = 'game' + i;
+                div.id = id;
+
+                div.className = 'email-item email-item-selected pure-g';
+
+                div.onclick = game_details(i);
+
+
+                div.innerHTML = ' <div class="pure-u">\n' +
+                    '                <img width="64" height="64" alt="Tilo Mitra&#x27;s avatar" class="email-avatar" src=' + games[i]['avatar'] + '>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="pure-u-3-4">\n' +
+                    '                <h5 class="email-name">' + games[i]['publisher'] + '</h5>\n' +
+                    '                <h4 class="email-subject">' + games[i]['subject'] + '</h4>\n' +
+                    '                <p class="email-desc">' + games[i]['body'] +
+                    '                </p>\n' +
+                    '            </div>';
+
+                document.getElementById('list').appendChild(div);
+            }
+        }
+
+        else {
+                document.getElementById('main').innerHTML = '';
+                document.getElementById('list').innerHTML = '';
+            }
+
+
+            show_game_details(0);
+
+    }
+
+
+    // on click for add new game
+    function save_game() {
+
+
+
+        let game = {
+            publisher : $('#publisher_input').val(),
+            avatar : $('#avatar_input').val(),
+            subject : $('#title_input').val(),
+            body : $('#description_input').val(),
+            date : $('#year_input').val(),
+            ifrmSrc : $('#frame_input').val(),
+        };
+
+
+        var temp_games = JSON.parse(localStorage.getItem("games"));
+
+        temp_games.unshift(game);
+
+        localStorage.setItem("games", JSON.stringify(temp_games));
+        inbox_games();
+
+    }
+
+
+    // on click for delete game
+    function delete_game() {
+
+        var games = JSON.parse(localStorage.getItem("games"));
+        var trash = JSON.parse(localStorage.getItem("trash"));
+
+        trash.unshift(games[selected_game]);
+
+
+        games.splice(selected_game , 1);
+
+        localStorage.setItem("trash" , JSON.stringify(trash));
+
+        localStorage.setItem("games" , JSON.stringify(games));
+
+        inbox_games();
+
+
+
+    }
+
+
+    // on click undo delete
+    var undo_delete = function () {
+
+
+        var data = JSON.parse(localStorage.getItem("games"));
+
+        var trash_data =  JSON.parse(localStorage.getItem("trash"));
+
+        data.unshift(trash_data[selected_game]);
+
+        trash_data.splice(selected_game , 1);
+
+        localStorage.setItem("games" , JSON.stringify(data));
+
+        localStorage.setItem("trash" , JSON.stringify(trash_data));
+
+
+
+        trash_games();
+
+
+    };
+
+    // show details of selected trash game
+
+    function trash_games() {
+
+        if(JSON.parse(localStorage.getItem("trash")).length > 0) {
+            document.getElementById('main').innerHTML = ' <div class="email-content" style="height: 100%">\n' +
+                '            <div class="email-content-header pure-g">\n' +
+                '                <div class="pure-u-1-2">\n' +
+                '                    <h1 class="email-content-title" id="title" ></h1>\n' +
+                '                    <p class="email-content-subtitle">\n' +
+                '                        Published by : <a id="publisher"></a>  <span id="publish_date"></span>\n' +
+                '                    </p>\n' +
+                '                </div>\n' +
+                '\n' +
+                '                <div class="email-content-controls pure-u-1-2">\n' +
+                '                    <button class="secondary-button pure-button" onclick="undo_delete()">Deleted</button>\n' +
+                '                    <button class="secondary-button pure-button">Forward</button>\n' +
+                '                    <button class="secondary-button pure-button">Move to</button>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '\n' +
+                '            <div class="email-content-body row content "  class="pure-u" style="  height: 500px">\n' +
+                '\n' +
+                '\n' +
+                '                <iframe id="play_game" width="100%" height="100%"></iframe>\n' +
+                't0            </div>\n' +
+                '        </div>';
+
+
+            games_list = document.getElementById('list');
+
+            while (games_list.firstChild) {
+                games_list.removeChild(games_list.firstChild);
+            }
+
+            var games = JSON.parse(localStorage.getItem("trash"));
+
+            for (var i = 0; i < games.length; i++) {
+                var div = document.createElement('div');
+                var id = 'game' + i;
+                div.id = id;
+
+                div.className = 'email-item email-item-selected pure-g';
+
+                div.onclick = trash_details(i);
+
+
+                div.innerHTML = ' <div class="pure-u">\n' +
+                    '                <img width="64" height="64" alt="Tilo Mitra&#x27;s avatar" class="email-avatar" src=' + games[i]['avatar'] + '>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '            <div class="pure-u-3-4">\n' +
+                    '                <h5 class="email-name">' + games[i]['publisher'] + '</h5>\n' +
+                    '                <h4 class="email-subject">' + games[i]['subject'] + '</h4>\n' +
+                    '                <p class="email-desc">' + games[i]['body'] +
+                    '                </p>\n' +
+                    '            </div>';
+
+                document.getElementById('list').appendChild(div);
+            }
+
+        }
+
+        else {
+            document.getElementById('main').innerHTML = '';
+            document.getElementById('list').innerHTML = '';
+        }
+
+        show_trash_details(0);
+
+    }
+
+
+    // load inbox on start
+    inbox_games();
+
+
+
+
+</script>
+
+
+
+
+</body>
+</html>
